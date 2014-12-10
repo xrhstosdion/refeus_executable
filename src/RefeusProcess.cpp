@@ -16,6 +16,12 @@
  */
 RefeusProcess::RefeusProcess() {
   parametersvector.push_back("startup.ini");
+  #ifdef win32
+  executable = "refeus.exe";
+  #endif
+  #ifdef unix
+  executable = "refeus.sh";
+  #endif
 }
 /** Argument Parser parses takes as parameter the command line then parses
   *  all the arguments that are separated from each other with a single blank
@@ -123,7 +129,6 @@ std::vector<std::string> &split(const std::string &string_to_split, char delimit
   *  then creates the process with the appropriate env. variables and ini file
   */
 bool RefeusProcess:: start() {
-  std::string executable = "refeus.exe";
   std::string executable_with_parameter = executable;
   std::vector<std::string>::iterator parameter_iterator;
   std::map<std::string, std::string>::iterator map_iterator;
