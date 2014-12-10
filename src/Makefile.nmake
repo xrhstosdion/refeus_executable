@@ -1,0 +1,2 @@
+all:
+	cl /EHsc refeus_executable.cpp
