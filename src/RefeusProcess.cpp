@@ -1,10 +1,16 @@
+#ifdef win32
 #include <windows.h>
 #pragma comment(lib,"user32.lib")
-#include <string>
+#endif
+#ifdef unix
+#include <iostream>
+#include <stdlib.h> /* putenv */
+#include <string.h> /* strdup */
+#include <unistd.h> /* execvp */
+#include <errno.h> /* errno */
+#endif
 #include <sstream>
-#include <map>
-#include <vector>
-#include "h/refeus_functions.h"
+#include <RefeusProcess.hpp>
 
 /** constructor
  */
