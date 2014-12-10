@@ -32,10 +32,10 @@ RefeusProcess::RefeusProcess() {
   *  --plus sets to plus.ini
   *  --cloud-enabled sets CLOUD_ENABLED to true
   */
-bool RefeusProcess::argParser(char* argument_cstr) {
+bool RefeusProcess::argParser(std::string command_line) {
   std::vector<std::string> per_blank_vector,per_quotes_vector;
   //splitting command line per single blanks
-  split(argument_cstr, ' ', per_blank_vector);
+  split(command_line, ' ', per_blank_vector);
   std::vector<std::string>::iterator it;
   for ( it = per_blank_vector.begin()
       ; it < per_blank_vector.end()
@@ -52,7 +52,7 @@ bool RefeusProcess::argParser(char* argument_cstr) {
     } else if ( *it == "--open" ) {
       //splitting command line per double quotes
       // THIS is invalid: split takes character as parameter, you give string
-      split(argument_cstr, '\"\"', per_quotes_vector);
+      split(command_line, '\"\"', per_quotes_vector);
       //per_quotes_vector.erase(per_quotes_vector.begin());      
       if ( per_quotes_vector.size() > 1 ) {
         configureOpenRefeusDocument(per_quotes_vector.at(1));
@@ -67,18 +67,24 @@ bool RefeusProcess::argParser(char* argument_cstr) {
       parametersvector.push_back("refeus.ini");
     } else if ( *it == "--cloud-enabled" ) {
       configureCloudSetting();
+    } else if ( *it == "--debug" ) {
+      configureDebug();
     }
   }
   return true;
+}
+void RefeusProcess::configureCloudSetting() {
+   environmentmap["CLOUD_ENABLED"] = "true";
+}
+void RefeusProcess::configureDebug() {
+  environmentmap["WKE_DEBUG"] = "YES";
+  environmentmap["WKE_DEBUG_CONSOLE"] = "YES";
 }
 void RefeusProcess::configureNewRefeusDocument() {
    environmentmap["open_refeus_database"] = "true";
 }
 void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
    environmentmap["refeus_database"] = path_name;
-}
-void RefeusProcess::configureCloudSetting() {
-   environmentmap["CLOUD_ENABLED"] = "true";
 }
 /**
   * Function langCheck takes as parameter the Language ID of the system
@@ -115,7 +121,7 @@ void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) 
   * \param delimiter_character - character for splitting
   * \param element_vector - reference vector for storing the split result
   */
-std::vector<std::string> &split(const std::string &string_to_split, char delimiter_character, std::vector<std::string> &element_vector) {
+std::vector<std::string> &RefeusProcess::split(const std::string &string_to_split, char delimiter_character, std::vector<std::string> &element_vector) {
   std::stringstream sstream(string_to_split);
   std::string item;
   while (std::getline(sstream, item, delimiter_character)) {
@@ -128,11 +134,10 @@ std::vector<std::string> &split(const std::string &string_to_split, char delimit
   *  prepares the full_executable path with the pre-configured ini file
   *  then creates the process with the appropriate env. variables and ini file
   */
-bool RefeusProcess:: start() {
+int RefeusProcess:: start() {
   std::string executable_with_parameter = executable;
   std::vector<std::string>::iterator parameter_iterator;
   std::map<std::string, std::string>::iterator map_iterator;
-  const char* executable_cstr = executable.c_str();
 
   #ifdef win32
   STARTUPINFO StartupInfo;                        //This is an [in] parameter
@@ -162,9 +167,10 @@ bool RefeusProcess:: start() {
   //Formatting exe to const char* and full_exe to char* for CreateProcess
   
   char* executable_with_parameter_cstr = new char [executable_with_parameter.size() + 1];
+  const char* executable_cstr = strdup(executable.c_str());
   std::copy(executable_with_parameter.begin(), executable_with_parameter.end(), executable_with_parameter_cstr);
   executable_with_parameter_cstr[executable_with_parameter.size()] = '\0';
-  bool start_refeus = CreateProcess( executable_cstr 
+  bool process_started = CreateProcess( executable_cstr 
                                    , executable_with_parameter_cstr              //exe + ini names
                                    , 0
                                    , 0
@@ -174,19 +180,20 @@ bool RefeusProcess:: start() {
                                    , 0
                                    , &StartupInfo
                                    , &ProcessInfo);
-    if ( start_refeus ){
+    if ( process_started ){
     WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
     CloseHandle(ProcessInfo.hThread);
     CloseHandle(ProcessInfo.hProcess);
   } else {
      MessageBox(NULL, "The process could not be started... \n" , "Process Failed!", MB_OK);
+     return 1;
   }
   #endif
   #ifdef unix
   /**
    * unix implementation only
    */
-  char **exec_argv = malloc(sizeof(char*) * (parametersvector.size() + 1) );
+  char **exec_argv = static_cast<char**>(malloc(sizeof(char*) * (parametersvector.size() + 1) ));
   int parameter_iterator_index = 0;
   for ( parameter_iterator = parametersvector.begin()
       ; parameter_iterator < parametersvector.end()
@@ -196,9 +203,11 @@ bool RefeusProcess:: start() {
     parameter_iterator_index++;
   }
   exec_argv[parameter_iterator_index] = NULL;
-  execvp(executable_cstr,exec_argv);
+  if ( execvp(executable.c_str(),exec_argv) == -1 ){
+    std::cerr << strerror(errno);
+  }
   #endif
-  return 1;
+  return 0;
 }
 void RefeusProcess::usage() {
   const char* help_string = "--help displays all possible arguments\n"
