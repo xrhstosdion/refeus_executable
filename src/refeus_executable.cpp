@@ -1,5 +1,11 @@
+#ifdef win32
 #include <windows.h>
-#include "refeus_functions.cpp"
+#endif
+#ifdef unix
+#include <iostream>
+#endif
+
+#include <RefeusProcess.hpp>
  
 #ifdef win32
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow ) {
