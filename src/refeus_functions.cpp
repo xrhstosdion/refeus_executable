@@ -40,26 +40,18 @@ void RefeusProcess::langCheck(int check) {
     case 1031:  //German
       environmentmap["DSC_Language"] = "German";
       environmentmap["Language"] = "German";
-      //putenv("DSC_Language=German");
-      //putenv("Language=German");
     break;
     case 1036:  //French
       environmentmap["DSC_Language"] = "French";
       environmentmap["Language"] = "French";
-      //putenv("DSC_Language=French");
-      //putenv("Language=French");
     break;
     case 1045:  //Polish
       environmentmap["DSC_Language"] = "Polish";
       environmentmap["Language"] = "Polish";
-      //putenv("DSC_Language=Polish");
-      //putenv("Language=Polish");
     break;
    default:  //English
      environmentmap["DSC_Language"] = "English";
      environmentmap["Language"] = "English";
-     //putenv("DSC_Language=English");
-     //putenv("Language=English");
    break;
   }
 }
