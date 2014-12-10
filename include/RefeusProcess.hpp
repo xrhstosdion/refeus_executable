@@ -4,21 +4,20 @@
 #include <vector>
 
 class RefeusProcess {
-    
-    private: std::string executable;
     private: std::map<std::string,std::string> environmentmap;
+    private: std::string executable;
     private: std::vector<std::string> parametersvector;
 
+    private: void configureCloudSetting();
+    private: void configureDebug();
     private: void configureNewRefeusDocument();
     private: void configureOpenRefeusDocument(std::string pathname);
-    private: void configureCloudSetting();
     private: void usage();
-    
+
     public: RefeusProcess();
-    public: bool argParser(char* cmd);
+    public: bool argParser(std::string command_line);
     public: void langCheck(int check);
-    public: void setEnvironment(std::string env_name, std::string env_value);   
+    public: void setEnvironment(std::string env_name, std::string env_value);
     public: std::vector<std::string> &split(const std::string &string_to_split, char delimiter_character, std::vector<std::string> &element_vector);
-    public: bool start();    
+    public: int start();
 };
-#endif
