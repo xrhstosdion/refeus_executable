@@ -55,6 +55,7 @@ bool RefeusProcess::argParser(std::string command_line) {
       split(command_line, '\"\"', per_quotes_vector);
       //per_quotes_vector.erase(per_quotes_vector.begin());      
       if ( per_quotes_vector.size() > 1 ) {
+        //TODO: use refeus_database_autostart
         configureOpenRefeusDocument(per_quotes_vector.at(1));
       } else {
         configureNewRefeusDocument();
@@ -69,7 +70,23 @@ bool RefeusProcess::argParser(std::string command_line) {
       configureCloudSetting();
     } else if ( *it == "--debug" ) {
       configureDebug();
+    } else if ( *it == "--language" ) {
+      //TODO: check for next prameter 'de' 'en' etc and override langcheck
+      configureDebug();
+    } else if ( *it == "--auto-backup" ) {
+      //TODO: set AUTO_BACKUP=YES
+    } else if ( *it == "--no-auto-backup" ) {
+      //TODO: set AUTO_BACKUP=NO
+    } else if ( *it == "--skip-maintenance" ) {
+      //TODO: set SKIP_MAINTENANCE=YES
+    } else if ( *it == "--startup-activity" ) {
+      //TODO: set STARTUP_ACTIVITY=next parameter (eg manage::overview)
     }
+    /**
+     * REFEUS_SETTINGS_LOCATION=[when set: ini-file for portable]
+     * REFEUS_DOCUMENTS_LOCATION=path/to/documents
+     * REFEUS_PICTURES_LOCATION=path/to/pictures
+     */
   }
   return true;
 }
@@ -215,7 +232,9 @@ void RefeusProcess::usage() {
        "--open \"C:/file_name\" starts refeus with specific file\n"
        "--plus sets the ini file to plus.ini\n"
        "--refeus sets the ini file to refeus.ini\n"
-       "--cloud-enabled sets CLOUD_ENABLED to true" 
+       "--debug sets the application to debug-mode (allows shift+ctrl+i)\n"
+       "--cloud-enabled sets CLOUD_ENABLED to true\n" 
+       "TODO: add more parameters"
        ;    
   #ifdef win32
   MessageBox(NULL, help_string, "Help!", MB_OK);
