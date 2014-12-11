@@ -1,2 +1,5 @@
-all:
-	cl /EHsc refeus_executable.cpp
+refeus.exe: refeus_executable.cpp RefeusProcess.obj
+	cl /EHsc refeus_executable.cpp /Fo refeus.exe
+
+RefeusProcess.obj: RefeusProcess.cpp ../include/RefeusProcess.hpp
+  cl RefeusProcess.cpp /Fo RefeusProcess.obj
