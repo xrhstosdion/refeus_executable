@@ -23,7 +23,7 @@ refeus_executable.msi: refeus_executable.exe msi/refeus_installer.wxs
  rc /r /fo .lib\icon.res rc/icon.rc
 
 clean:
- md .lib
+ if NOT EXIST ".lib" md .lib
  del .lib\*.obj
  del *.exe
  del .lib\*.res
