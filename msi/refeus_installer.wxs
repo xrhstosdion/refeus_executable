@@ -6,7 +6,7 @@
            Name="Refeus" Version="$(var.ProductVersion)" Manufacturer="RefeusMsi GbR" Language="1033">
      <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package"/>
      <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
-     <Icon Id="ProductIcon" SourceFile="refeus.ico"/>
+     <Icon Id="ProductIcon" SourceFile="rc/refeus.ico"/>
      <Property Id="ARPPRODUCTICON" Value="ProductIcon"/>
      <Upgrade Id="$(var.ProductUpgradeCode)">
        <UpgradeVersion Minimum="$(var.ProductVersion)" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
