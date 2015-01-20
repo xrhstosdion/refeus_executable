@@ -122,13 +122,20 @@ bool RefeusProcess::argParser(std::string command_line) {
         break;
       }
     } else if ( *it == "--auto-backup" ) {
-      //TODO: set AUTO_BACKUP=YES
+      configureAutoBackup(true);
     } else if ( *it == "--no-auto-backup" ) {
-      //TODO: set AUTO_BACKUP=NO
+      configureAutoBackup(false);
     } else if ( *it == "--skip-maintenance" ) {
-      //TODO: set SKIP_MAINTENANCE=YES
+      configureSkipMaintenance(true)
+    } else if ( *it == "--no-skip-maintenance" ) {
+      configureSkipMaintenance(false)
     } else if ( *it == "--startup-activity" ) {
-      //TODO: set STARTUP_ACTIVITY=next parameter (eg manage::overview)
+      ++it; // scroll to next (careful, processing in for-loop)
+      std::string startup_activity = argParserNext(per_blank_vector, it);
+      configureStartupActivity(startup_activity));
+      if ( it == per_blank_vector.end() ){
+        break;
+      }
     }
     /**
      * REFEUS_SETTINGS_LOCATION=[when set: ini-file for portable]
@@ -137,6 +144,17 @@ bool RefeusProcess::argParser(std::string command_line) {
      */
   }
   return true;
+}
+
+/**
+ * configure to enable auto-backup
+ */
+void RefeusProcess::configureAutoBackup(bool enabled){
+  if ( enabled ){
+    environmentmap["AUTO_BACKUP"] = "YES";
+  } else {
+    environmentmap["AUTO_BACKUP"] = "NO";
+  }
 }
 
 /**
@@ -197,6 +215,28 @@ void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
    environmentmap["refeus_database"] = path_name;
    environmentmap["refeus_database_autostart"] = "true";
 }
+
+
+/**
+ * configure to skip the database maintenance which can be anoying in
+ * large document projects
+ */
+void RefeusProcess::configureSkipMaintenance(bool enabled){
+  if ( enabled ){
+    environmentmap["SKIP_MAINTENANCE"] = "YES";
+  } else {
+    environmentmap["SKIP_MAINTENANCE"] = "NO";
+  }
+}
+
+/**
+ * configure to set the default startup activity
+ * only useful in combinantion with --open and other
+ * options skipping the startup launcher
+ */
+ void RefeusProcess::configureStartupActivity(std::string activity_name){
+   environmentmap["STARTUP_ACTIVITY"] = activity_name;
+ }
 
 /**
   * Function langCheck takes as parameter the Language ID of the system
@@ -339,7 +379,10 @@ void RefeusProcess::usage() {
        "--plus sets the ini file to plus.ini\n"
        "--refeus sets the ini file to refeus.ini\n"
        "--debug sets the application to debug-mode (allows shift+ctrl+i)\n"
-       "--cloud-enabled sets CLOUD_ENABLED to true\n" 
+       "--cloud-enabled allows operations on webdav storage\n"
+       "--[no]-auto-backup enable or disable the automatic backup each time refeus starts\n"
+       "--[no]-skip-maintenance enable or disable the initial maintenance check when refeus opens\n" 
+       "--language [de|en|fr*|pl*] set default language when application starts\n" 
        "TODO: add more parameters"
        ;    
   #ifdef _WIN32

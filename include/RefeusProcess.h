@@ -9,12 +9,15 @@ class RefeusProcess {
     private: std::vector<std::string> parametersvector;
 
     private: std::string argParserNext(std::vector<std::string> arguments_separated_by_blank, std::vector<std::string>::iterator start_iterator);
+    private: void configureAutoBackup(bool enabled);
     private: void configureCloudSetting();
     private: void configureDebug();
     private: void configureNewRefeusDocument();
     private: void configureLanguageFromIsoString(std::string iso_language);
     private: void configureOpenRefeusDocument();
     private: void configureOpenRefeusDocument(std::string pathname);
+    private: void configureSkipMaintenance(bool enabled);
+    private: void configureStartupActivity(std::string activity_name);
     private: void usage();
 
     public: RefeusProcess();
