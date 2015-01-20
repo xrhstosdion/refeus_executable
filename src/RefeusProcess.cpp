@@ -159,6 +159,7 @@ void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
 }
 void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
    environmentmap["refeus_database"] = path_name;
+   environmentmap["refeus_database_autostart"] = "true";
 }
 /**
   * Function langCheck takes as parameter the Language ID of the system
