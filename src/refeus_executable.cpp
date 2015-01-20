@@ -4,7 +4,7 @@
 #ifdef unix
 #include <iostream>
 #endif
-#include <c:\build\refeus_executable_updated\include\RefeusFunctionsDefinitions.hpp>
+#include <RefeusProcess.h>
 
 #ifdef _WIN32
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow ) {
@@ -14,7 +14,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
   std::string command_line = command_line_cstr;
   r.argParser(command_line);
   r.langCheck(GetUserDefaultLCID());
-  //r.start();
+  r.start();
   //return r.start();
   //system("pause");
   }
@@ -39,6 +39,5 @@ int main(int argc, char** argv) {
   //return r.start();
   //rip.start();
   //system("pause");
- 
 }
 #endif

@@ -1,0 +1,31 @@
+#include <windows.h>
+#include <refeus.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     RC_FILE_VERSION
+PRODUCTVERSION  RC_PRODUCT_VERSION
+FILEFLAGS       0x0L
+FILESUBTYPE	    0x0L 
+FILEOS          VOS__WINDOWS32
+FILETYPE        RC_FILETYPE
+FILESUBTYPE     VFT2_UNKNOWN
+BEGIN 
+  BLOCK "StringFileInfo"  
+  BEGIN
+    BLOCK "040904B0"
+		 BEGIN
+		    VALUE "CompanyName","Refeus company Gbr"
+		    VALUE "ProductName",RC_PRODUCT_NAME
+		    VALUE "FileDescription",RC_FILE_DESCRIPTION
+		    VALUE "InternalName",RC_INTERNAL_NAME
+		    VALUE "OriginalFilename",RC_FILENAME_STRING
+		    VALUE "FileVersion",RC_FILE_VERSION_STRING
+		    VALUE "ProductVersion",RC_PRODUCT_VERSION_STRING
+		    VALUE "LegalCopyright","Copyright  2015 Refeus GbR"
+		 END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END
