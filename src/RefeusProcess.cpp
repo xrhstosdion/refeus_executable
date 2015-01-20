@@ -17,6 +17,7 @@
  */
 RefeusProcess::RefeusProcess() {
   parametersvector.push_back("startup.ini");
+  configureAutoBackup(true);
   #ifdef _WIN32
   executable = "refeus.exe";
   #endif
