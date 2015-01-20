@@ -1,7 +1,12 @@
-all: refeus_executable.exe
+all: refeus_executable.exe refeus_executable.msi
 
 refeus_executable.exe: .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res
 	link .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res /out:"refeus_executable.exe"
+
+refeus_executable.msi: refeus_executable.exe msi/refeus_installer.wxs
+ if NOT EXIST ".lib" md .lib
+ candle msi/refeus_installer.wxs -o ".lib/refeus_installer.wixobj"
+ light .lib/refeus_installer.wixobj -o "refeus_executable.msi" -pdbout ".lib/refeus_executable.wixpdb"
 
 .lib/refeus_executable.obj: src/refeus_executable.cpp .lib/RefeusProcess.obj
 	if NOT EXIST ".lib" md .lib
@@ -10,7 +15,7 @@ refeus_executable.exe: .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/re
 .lib/RefeusProcess.obj: src/RefeusProcess.cpp include/RefeusProcess.h
 	if NOT EXIST ".lib" md .lib
  cl /I include/ /EHsc /c src/RefeusProcess.cpp /Fo".lib/RefeusProcess.obj"
- 
+
 .lib/refeus.res: rc/refeus.rc
  rc /r /fo".lib\refeus.res" rc/refeus.rc
 
@@ -18,6 +23,11 @@ refeus_executable.exe: .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/re
  rc /r /fo .lib\icon.res rc/icon.rc
 
 clean:
+ md .lib
  del .lib\*.obj
  del *.exe
  del .lib\*.res
+ del .lib\*.wixobj
+ del .lib\*.wixpdb
+ del *.msi
+ rmdir .lib
