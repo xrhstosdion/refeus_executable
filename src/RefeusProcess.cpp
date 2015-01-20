@@ -137,6 +137,8 @@ bool RefeusProcess::argParser(std::string command_line) {
       if ( it == per_blank_vector.end() ){
         break;
       }
+    } else if ( *it == "--infopool" ) {
+      configureInfopool();
     }
     /**
      * REFEUS_SETTINGS_LOCATION=[when set: ini-file for portable]
@@ -184,6 +186,24 @@ void RefeusProcess::configureDebug() {
  */
 void RefeusProcess::configureNewRefeusDocument() {
    environmentmap["open_refeus_database"] = "true";
+}
+
+/**
+ * run the infopool nodejs server
+ * TODO: taskbar icon to close the application
+ */
+void RefeusProcess::configureInfopool() {
+   environmentmap.clear();
+   parametersvector.clear();
+   #ifdef _WIN32
+   executable = "node.exe";
+   SetCurrentDirectory("infopool");
+   #else
+   executable = "node";
+   std::string ip_path = DATAROOTDIR + "infopool";
+   chdir(ip_path.c_str());
+   #endif
+   parametersvector.push_back("app.js");
 }
 
 /**
@@ -384,6 +404,7 @@ void RefeusProcess::usage() {
        "--[no]-auto-backup enable or disable the automatic backup each time refeus starts\n"
        "--[no]-skip-maintenance enable or disable the initial maintenance check when refeus opens\n" 
        "--language [de|en|fr*|pl*] set default language when application starts\n" 
+       "--infopool start local infopool (plus only)\n"
        "TODO: add more parameters"
        ;    
   #ifdef _WIN32

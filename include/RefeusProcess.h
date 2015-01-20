@@ -13,6 +13,7 @@ class RefeusProcess {
     private: void configureCloudSetting();
     private: void configureDebug();
     private: void configureNewRefeusDocument();
+    private: void configureInfopool();
     private: void configureLanguageFromIsoString(std::string iso_language);
     private: void configureOpenRefeusDocument();
     private: void configureOpenRefeusDocument(std::string pathname);
