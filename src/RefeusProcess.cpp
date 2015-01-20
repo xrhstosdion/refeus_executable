@@ -157,6 +157,10 @@ void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
     langcheck(1045);
   }
 }
+void RefeusProcess::configureOpenRefeusDocument() {
+   environmentmap["open_refeus_database"] = "true";
+}
+
 void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
    environmentmap["refeus_database"] = path_name;
    environmentmap["refeus_database_autostart"] = "true";
