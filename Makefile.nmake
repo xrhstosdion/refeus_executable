@@ -1,2 +1,23 @@
-all:
-	cl /EHsc refeus_executable.cpp
+all: refeus_executable.exe
+
+refeus_executable.exe: .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res
+	link .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res /out:"refeus_executable.exe"
+
+.lib/refeus_executable.obj: src/refeus_executable.cpp .lib/RefeusProcess.obj
+	if NOT EXIST ".lib" md .lib
+ cl /EHsc /I include/ /c src/refeus_executable.cpp /Fo".lib/refeus_executable.obj" 
+
+.lib/RefeusProcess.obj: src/RefeusProcess.cpp include/RefeusProcess.h
+	if NOT EXIST ".lib" md .lib
+ cl /I include/ /EHsc /c src/RefeusProcess.cpp /Fo".lib/RefeusProcess.obj"
+ 
+.lib/refeus.res: rc/refeus.rc
+ rc /r /fo".lib\refeus.res" rc/refeus.rc
+
+.lib/icon.res: rc/icon.rc
+ rc /r /fo .lib\icon.res rc/icon.rc
+
+clean:
+ del .lib\*.obj
+ del *.exe
+ del .lib\*.res
