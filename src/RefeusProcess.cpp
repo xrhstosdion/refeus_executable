@@ -64,6 +64,7 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
   start_iterator = it;
   return next_arg;
 }
+
 /** Argument Parser parses takes as parameter the command line then parses
   *  all the arguments that are separated from each other with a single blank
   *  --help outputs all possible arguments
@@ -219,9 +220,15 @@ void RefeusProcess::langCheck(int api_language_code) {
       break;
   }
 }
+
+/**
+ * stores the given key-value pair to apply it to the executable
+ * that is started in the end
+ */
 void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) {
   environmentmap[env_name] = env_value;
 }
+
 /** \brief Split String into Vector using a delimter
   * \param string_to_split - some string to be split by a specific character
   * \param delimiter_character - character for splitting
@@ -235,6 +242,7 @@ std::vector<std::string> &RefeusProcess::split(const std::string &string_to_spli
   }
   return element_vector;
 }  
+
 /** Function start takes no arguments 
   *  sets all environment variables that are saved in environmenenmap
   *  prepares the full_executable path with the pre-configured ini file
@@ -315,6 +323,10 @@ int RefeusProcess:: start() {
   #endif
   return 0;
 }
+
+/**
+ * display a dialog / terminal output with helpful information
+ */
 void RefeusProcess::usage() {
   const char* help_string = "--help displays all possible arguments\n"
        "--new opens a 'save as' dialog window\n"
