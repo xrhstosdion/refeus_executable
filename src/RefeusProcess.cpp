@@ -132,9 +132,19 @@ bool RefeusProcess::argParser(std::string command_line) {
   }
   return true;
 }
+
+/**
+ * configure to enable certain features that are only available
+ * with the infopool2 + webdav service that allows syncronizing and
+ * storing document databases on remote systems
+ */
 void RefeusProcess::configureCloudSetting() {
    environmentmap["CLOUD_ENABLED"] = "true";
 }
+
+/**
+ * configure debug mode
+ */
 void RefeusProcess::configureDebug() {
   #ifdef _WIN32
   executable = "code.exe"; /** start a commandline window to output debug messages*/
@@ -142,10 +152,19 @@ void RefeusProcess::configureDebug() {
   environmentmap["WKE_DEBUG"] = "YES";
   environmentmap["WKE_DEBUG_CONSOLE"] = "YES";
 }
+
+/**
+ * show a save-as dialog instead of the startup dialog
+ * the given filename will be created and used as the docdb
+ */
 void RefeusProcess::configureNewRefeusDocument() {
    environmentmap["open_refeus_database"] = "true";
 }
 
+/**
+ * based on given string, configure application to load language
+ * the implementation could use a better method to map from iso to win32 codes
+ */
 void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
   if ( iso_language == "en" ){
     langcheck(0); //default
@@ -157,14 +176,22 @@ void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
     langcheck(1045);
   }
 }
+
+/**
+ * show file-open dialog, not the default startup
+ */
 void RefeusProcess::configureOpenRefeusDocument() {
    environmentmap["open_refeus_database"] = "true";
 }
 
+/**
+ * show given path_name and open directly
+ */
 void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
    environmentmap["refeus_database"] = path_name;
    environmentmap["refeus_database_autostart"] = "true";
 }
+
 /**
   * Function langCheck takes as parameter the Language ID of the system
   * Checks if it is German->French->Polish->English
