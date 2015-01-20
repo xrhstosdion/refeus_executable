@@ -114,8 +114,7 @@ bool RefeusProcess::argParser(std::string command_line) {
     } else if ( *it == "--debug" ) {
       configureDebug();
     } else if ( *it == "--language" ) {
-      //TODO: check for next prameter 'de' 'en' etc and override langcheck
-      configureDebug();
+      configureLanguageFromIsoString(argParserNext(per_blank_vector, it));
     } else if ( *it == "--auto-backup" ) {
       //TODO: set AUTO_BACKUP=YES
     } else if ( *it == "--no-auto-backup" ) {
@@ -137,6 +136,9 @@ void RefeusProcess::configureCloudSetting() {
    environmentmap["CLOUD_ENABLED"] = "true";
 }
 void RefeusProcess::configureDebug() {
+  #ifdef _WIN32
+  executable = "code.exe"; /** start a commandline window to output debug messages*/
+  #endif
   environmentmap["WKE_DEBUG"] = "YES";
   environmentmap["WKE_DEBUG_CONSOLE"] = "YES";
 }
