@@ -23,6 +23,47 @@ RefeusProcess::RefeusProcess() {
   executable = "refeus.sh";
   #endif
 }
+/**
+ * get the next argument from a vector that is split by blanks
+ * @return string
+ * @param arguments_separated_by_blank (unmodifyable vector, passed by reference for performance)
+ * @param start_iterater reference to move iterator for the argParser
+ * --last "noblank"
+ * --last "with blank"
+ * --last "with many blanks"
+ */
+std::string RefeusProcess::argParserNext(const std::vector<std::string> &arguments_separated_by_blank, std::vector<std::string>::iterator &start_iterator){
+  std::string next_arg = "";
+  next_arg = (*start_iterator);
+  for ( it = start_iterator
+      ; it != arguments_separated_by_blank.end()
+      ; it++
+      ){
+    if ( (*it).at(0) == "\""
+      && !(*it).at((*it).size()-1) == "\""
+      ){
+      next_arg = (*it).substr(1,(*it).size()-2);
+      in_quotes = true;
+    }
+    if ( (*it).at(0) == "\""
+      && (*it).at((*it).size()-1) == "\""
+      ){
+      next_arg = (*it).substr(1,(*it).size()-3);
+      break;
+    }
+    if ( in_quotes && (*it).at((*it).size()-1) == "\"" ){
+      next_arg+= (*it).substr(0,(*it).size()-2);
+      break;
+    }
+    if ( in_quotes ){
+      next_arg+= " " + next_arg;
+      continue;
+    }
+    break;
+  }
+  start_iterator = it;
+  return next_arg;
+}
 /** Argument Parser parses takes as parameter the command line then parses
   *  all the arguments that are separated from each other with a single blank
   *  --help outputs all possible arguments
