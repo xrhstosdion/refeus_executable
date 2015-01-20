@@ -94,15 +94,15 @@ bool RefeusProcess::argParser(std::string command_line) {
     if ( *it == "--new" ) {
       configureNewRefeusDocument();
     } else if ( *it == "--open" ) {
-      //splitting command line per double quotes
-      // THIS is invalid: split takes character as parameter, you give string
-      split(command_line, "\"\"", per_quotes_vector);
-      //per_quotes_vector.erase(per_quotes_vector.begin());      
-      if ( per_quotes_vector.size() > 1 ) {
-        //TODO: use refeus_database_autostart
-        configureOpenRefeusDocument(per_quotes_vector.at(1));
+      ++it; // scroll to next (careful, processing in for-loop)
+      document_path = argParserNext(per_blank_vector, it);
+      if ( document_path != "" ) {
+        configureOpenRefeusDocument(document_path);
       } else {
         configureNewRefeusDocument();
+      }
+      if ( it == per_blank_vector.end() ){
+        break;
       }
     } else if ( *it == "--plus" ) {
       parametersvector.clear();
@@ -115,7 +115,12 @@ bool RefeusProcess::argParser(std::string command_line) {
     } else if ( *it == "--debug" ) {
       configureDebug();
     } else if ( *it == "--language" ) {
-      configureLanguageFromIsoString(argParserNext(per_blank_vector, it));
+      ++it; // scroll to next (careful, processing in for-loop)
+      std::string iso_language = argParserNext(per_blank_vector, it);
+      configureLanguageFromIsoString(iso_language);
+      if ( it == per_blank_vector.end() ){
+        break;
+      }
     } else if ( *it == "--auto-backup" ) {
       //TODO: set AUTO_BACKUP=YES
     } else if ( *it == "--no-auto-backup" ) {
