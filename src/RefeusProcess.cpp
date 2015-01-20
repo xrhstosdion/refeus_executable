@@ -11,6 +11,7 @@
 #endif
 #include <sstream>
 #include <RefeusProcess.h>
+#include <config.h>
 
 /** constructor
  */
