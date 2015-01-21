@@ -208,18 +208,46 @@ void RefeusProcess::configureInfopool() {
 }
 
 /**
+  * Function langCheck takes as parameter the Language ID of the system
+  * Checks if it is German->French->Polish->English
+  * Then sets the appropriate Envir-Variables to the language that got 
+  * matched first
+  * \param api_language_code - windows-api language code
+  */
+void RefeusProcess::configureLanguageFromAPICode(int api_language_code) {
+  switch ( api_language_code ) {
+    case 1031:  //German
+      environmentmap["DSC_Language"] = "German";
+      environmentmap["Language"] = "German";
+      break;
+    case 1036:  //French
+      environmentmap["DSC_Language"] = "French";
+      environmentmap["Language"] = "French";
+      break;
+    case 1045:  //Polish
+      environmentmap["DSC_Language"] = "Polish";
+      environmentmap["Language"] = "Polish";
+      break;
+    default:  //English
+      environmentmap["DSC_Language"] = "English";
+      environmentmap["Language"] = "English";
+      break;
+  }
+}
+
+/**
  * based on given string, configure application to load language
  * the implementation could use a better method to map from iso to win32 codes
  */
 void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
   if ( iso_language == "en" ){
-    langcheck(0); //default
+    configureLanguageFromAPICode(0); //default
   } else if (iso_language == "de") {
-    langcheck(1031);
+    configureLanguageFromAPICode(1031);
   } else if (iso_language == "fr") {
-    langcheck(1036);
+    configureLanguageFromAPICode(1036);
   } else if (iso_language == "pl") {
-    langcheck(1045);
+    configureLanguageFromAPICode(1045);
   }
 }
 
@@ -259,34 +287,6 @@ void RefeusProcess::configureSkipMaintenance(bool enabled){
  void RefeusProcess::configureStartupActivity(std::string activity_name){
    environmentmap["STARTUP_ACTIVITY"] = activity_name;
  }
-
-/**
-  * Function langCheck takes as parameter the Language ID of the system
-  * Checks if it is German->French->Polish->English
-  * Then sets the appropriate Envir-Variables to the language that got 
-  * matched first
-  * \param api_language_code - windows-api language code
-  */
-void RefeusProcess::langCheck(int api_language_code) {
-  switch ( api_language_code ) {
-    case 1031:  //German
-      environmentmap["DSC_Language"] = "German";
-      environmentmap["Language"] = "German";
-      break;
-    case 1036:  //French
-      environmentmap["DSC_Language"] = "French";
-      environmentmap["Language"] = "French";
-      break;
-    case 1045:  //Polish
-      environmentmap["DSC_Language"] = "Polish";
-      environmentmap["Language"] = "Polish";
-      break;
-    default:  //English
-      environmentmap["DSC_Language"] = "English";
-      environmentmap["Language"] = "English";
-      break;
-  }
-}
 
 /**
  * stores the given key-value pair to apply it to the executable
