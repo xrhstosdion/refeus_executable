@@ -139,8 +139,7 @@ bool RefeusProcess::argParser(std::string command_line) {
         if (found!=std::string::npos) {
           MessageBox(NULL, "Not Relative" , "Dbg Message for Not relative!", MB_OK);
           configureOpenRefeusDocument(document_path);
-        }
-        else {
+        } else {
           MessageBox(NULL, "Relative" , "Dbg Message for relative!", MB_OK);
           char cCurrentPath[FILENAME_MAX];
           if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
@@ -148,7 +147,7 @@ bool RefeusProcess::argParser(std::string command_line) {
           }
           //code for appending cCurrentPath with document_path in order to be absolute filename
           //configureOpenRefeusDocument(appended_string);
-       }
+        }
         MessageBox(NULL, document_path.c_str() , "Help!", MB_OK); //whole string of document_path
       } else {
         configureNewRefeusDocument();
