@@ -22,6 +22,27 @@
 #include <RefeusProcess.h>
 #include <config.h>
 
+/**
+ * debug helper macro which allows the power of stringstream
+ * during debugging. only works when the class it uses implemnts a debug function
+ */
+#define std_debug(expr) {std::stringstream ss; ss << expr; _debug(ss.str());}
+/**
+ * debug two strings, messagebox on win, stdout on linux
+ */
+void RefeusProcess::_debug(std::string message,std::string title){
+  if ( !debug ){
+    return;
+  }
+  if ( title == "" ){
+    title = "debug";
+  }
+#ifdef _WIN32
+  MessageBox(NULL,message.c_str(),title.c_str(), MB_OK);
+#else
+  std::cout << title << ": [" << message << "]" << std::endl << std::flush;
+#endif
+}
 /** constructor
  */
 RefeusProcess::RefeusProcess()
@@ -72,7 +93,7 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
       && (*it).at((*it).size()-1) != '\"'
       && (*it).size() > 1
       ){
-      if ( debug ) { std::cout << "begin quotes" << std::endl << std::flush; }
+      //std_debug("begin quotes");
       next_arg = (*it).substr(1,(*it).size()-1);
       in_quotes = true;
       continue;
@@ -81,13 +102,13 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
       && (*it).at((*it).size()-1) == '\"'
       && (*it).size() > 1
       ){
-      if ( debug ) { std::cout << "full-quoted" << std::endl << std::flush; }
+      //std_debug("full-quoted");
       next_arg = (*it).substr(1,(*it).size()-2);
       break;
     }
 
     if ( in_quotes && (*it).at((*it).size()-1) == '\"' ){
-      if ( debug ) { std::cout << "end quotes" << std::endl << std::flush; }
+      //std_debug("end quotes");
       next_arg+= " " + (*it).substr(0,(*it).size()-1);
       break;
     }
@@ -100,7 +121,7 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
     break;
   }
   start_iterator = ++it;
-  // if ( debug ) { std::cout << "next_arg: ret:[" << next_arg << "]" << std::endl << std::flush; }
+  //std_debug("next_arg: ret:[" << next_arg << "]");
   return next_arg;
 }
 
@@ -122,7 +143,7 @@ bool RefeusProcess::argParser(std::string command_line) {
       ; it < per_blank_vector.end()
       ; ++it
       ) {
-    if ( debug ) std::cout << "param: [" << *it << "]" << std::endl << std::flush;
+    //std_debug("param: [" << *it << "]");
     if ( *it == "--help"
        ||*it == "/?"
        ) {
@@ -411,7 +432,7 @@ int RefeusProcess:: start() {
     std::copy(env.begin(), env.end(), env_cstr);
     env_cstr[env.size()] = '\0';
     putenv(env_cstr);
-    if ( debug ) { std::cout << "env: " << env << std::endl << std::flush; }
+    std_debug("env: " << env);
   }
 
   #ifdef _WIN32
@@ -433,6 +454,8 @@ int RefeusProcess:: start() {
   const char* executable_cstr = strdup(executable.c_str());
   std::copy(executable_with_parameter.begin(), executable_with_parameter.end(), executable_with_parameter_cstr);
   executable_with_parameter_cstr[executable_with_parameter.size()] = '\0';
+  std_debug("executing: [" << executable_cstr << "] " << executable_with_parameter_cstr);
+
   bool process_started = CreateProcess( executable_cstr 
                                    , executable_with_parameter_cstr              //exe + ini names
                                    , 0
@@ -458,12 +481,13 @@ int RefeusProcess:: start() {
    */
   char **exec_argv = static_cast<char**>(malloc(sizeof(char*) * (parametersvector.size() + 1) ));
   int parameter_iterator_index = 0;
-  if ( debug ) { std::cout << "executable: " << executable << std::endl << std::flush; }
+  std_debug("executable: " << executable);
   for ( parameter_iterator = parametersvector.begin()
       ; parameter_iterator < parametersvector.end()
       ; ++parameter_iterator
       ) {
-    if ( debug ) { std::cout << "parameter: " << *parameter_iterator << std::endl << std::flush; }
+      ){
+    std_debug("parameter: " << *parameter_iterator);
     exec_argv[parameter_iterator_index] = strdup((*parameter_iterator).c_str());
     parameter_iterator_index++;
   }
