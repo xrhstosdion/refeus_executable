@@ -57,6 +57,7 @@ RefeusProcess::RefeusProcess()
   parametersvector.push_back("startup.ini");
   configureAutoBackup(true);
 }
+
 /**
  * get the next argument from a vector that is split by blanks
  * @return string
@@ -133,10 +134,41 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
   *  --refeus sets to refeus.ini 
   *  --plus sets to plus.ini
   *  --cloud-enabled sets CLOUD_ENABLED to true
+  * "[c:/]path/to/filename" (only parameter, always quoted)
   */
 bool RefeusProcess::argParser(std::string command_line) {
+  std_debug(command_line);
   std::vector<std::string> per_blank_vector;
   std::vector<std::string>::iterator it;
+  std::string document_path;
+
+  char module_path_c[MAX_PATH];
+  GetModuleFileName(NULL,module_path_c,sizeof(module_path_c));
+  std::string module_path = module_path_c; // including xxx.exe
+  std::string quoted_module_path = "\"" + module_path + "\"";
+  if ( command_line.find(module_path) == 0 ){
+    std_debug("unquoted module: [" << command_line << "]");
+    command_line = command_line.substr(module_path.size() + 1,command_line.size() - module_path.size() - 1);
+  }
+  if ( command_line.find(quoted_module_path) == 0 ){
+    command_line = command_line.substr(quoted_module_path.size(),command_line.size() - quoted_module_path.size());
+    std_debug("quoted module: [" << command_line << "]");
+  }
+  /** eat leading whitespaces */
+  while ( command_line.at(0) == ' ' ){
+    command_line = command_line.substr(1,command_line.size() - 1);
+  }
+  /** skip parsing when and interpet all as quoted filename
+   * may also match ["filename" --language "de"], but we wont care!
+   */
+  if ( command_line.at(0) == '\"'
+    && command_line.at(command_line.size()-1) == '\"'
+	&& command_line.size() > 2
+	){
+	document_path = command_line.substr(1,command_line.size()-1);
+	configureOpenRefeusDocument(document_path);
+	return true;
+  }
   //splitting command line per single blanks
   split(command_line, ' ', per_blank_vector);
   for ( it = per_blank_vector.begin()
@@ -154,28 +186,9 @@ bool RefeusProcess::argParser(std::string command_line) {
       configureNewRefeusDocument();
     } else if ( *it == "--open" ){
       ++it; // scroll to next (careful, processing in for-loop)
-      std::string document_path = argParserNext(per_blank_vector, it);
-      if ( document_path != "" ) {
-        std::size_t found=document_path.find(":");
-        if (found!=std::string::npos) {
-          MessageBox(NULL, "Not Relative" , "Dbg Message for Not relative!", MB_OK);
-          configureOpenRefeusDocument(document_path);
-        } else {
-          MessageBox(NULL, "Relative" , "Dbg Message for relative!", MB_OK);
-          //code for current working path
-          char cCurrentPath[FILENAME_MAX];
-          if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
-            return errno;
-          }
-          MessageBox(NULL, cCurrentPath, "current working path!", MB_OK);
-          //code for appending cCurrentPath with document_path in order to be absolute filename
-          std::string cCurrentPath_cstr(cCurrentPath);
-          std::string correct = cCurrentPath_cstr + "\\" + document_path;
-          configureOpenRefeusDocument(correct);
-          const char* cc = correct.c_str();
-          MessageBox(NULL, cc, "Relative fixed to absolute", MB_OK); //whole string of document_path
-        }
-        MessageBox(NULL, document_path.c_str() , "User --open input!", MB_OK); //whole string of document_path
+      document_path = argParserNext(per_blank_vector, it);
+      if ( document_path != "" ){
+	    configureOpenRefeusDocument(document_path);
       } else {
         configureNewRefeusDocument();
       }
@@ -346,8 +359,11 @@ void RefeusProcess::configureOpenRefeusDocument() {
  * show given path_name and open directly
  */
 void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
-   environmentmap["refeus_database"] = path_name;
-   environmentmap["refeus_database_autostart"] = "true";
+  char abs_path_name_c[MAX_PATH];
+  GetFullPathName(path_name.c_str(),MAX_PATH,abs_path_name_c,NULL);
+  std_debug("open: " << path_name << "@" << abs_path_name_c);
+  environmentmap["refeus_database"] = abs_path_name_c;
+  environmentmap["refeus_database_autostart"] = "true";
 }
 
 
@@ -405,24 +421,16 @@ int RefeusProcess:: start() {
   std::map<std::string, std::string>::iterator map_iterator;
   #ifdef _WIN32
   //path of the executable
-  char buffer[MAX_PATH];
-  GetModuleFileName(NULL,buffer,sizeof(buffer));
-  const char* path_string = buffer;
-  MessageBox(NULL, path_string, "Exe path!", MB_OK);  //absolute path of executable
-  //current working path
-  //char cCurrentPath[FILENAME_MAX];
-  //if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-     //{
-     //return errno;
-     //}
-  //MessageBox(NULL, cCurrentPath, "curpath!", MB_OK);
-  //std::string docdb_file = "\\default.docdb";
-  //std::string cCurrentPath_cstr(cCurrentPath);
-  //std::string correct = cCurrentPath_cstr + docdb_file;
-  //const char* cc = correct.c_str();
-  //MessageBox(NULL, cc, "docdb path!", MB_OK);
-  //configureOpenRefeusDocument(correct);
-  SetCurrentDirectory("bin");
+  char module_path_c[MAX_PATH];
+  GetModuleFileName(NULL,module_path_c,sizeof(module_path_c));
+  std::string module_path = module_path_c; // including xxx.exe
+  /** set the current working directory to the location of the module + bin 
+   * this is required because registry association of *.docdb executes with
+   * weird current directory
+   */
+  std::string bin_path = module_path.substr(0,module_path.rfind("\\")) + "\\bin";
+  SetCurrentDirectory(bin_path.c_str());
+
   STARTUPINFO StartupInfo;                        //This is an [in] parameter
   PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
   #endif
