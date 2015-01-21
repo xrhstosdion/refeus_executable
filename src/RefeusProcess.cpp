@@ -9,6 +9,7 @@
 #include <unistd.h> /* execvp */
 #include <errno.h> /* errno */
 #endif
+#include <iostream>
 #include <sstream>
 #include <RefeusProcess.h>
 #include <config.h>
