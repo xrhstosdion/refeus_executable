@@ -29,41 +29,67 @@ RefeusProcess::RefeusProcess() {
  * get the next argument from a vector that is split by blanks
  * @return string
  * @param arguments_separated_by_blank (unmodifyable vector, passed by reference for performance)
- * @param start_iterater reference to move iterator for the argParser
+ * @param start_iterator reference to move iterator for the argParser
  * --last "noblank"
  * --last "with blank"
  * --last "with many blanks"
+ * --last " "
+ * --last " beforeblank"
+ * --last "afterblank "
+ * --last " centeredinblanks "
+ * --last " escaped\"quote " (no working!)
+ * --last " escaped \"quote with\" blank " (no working!)
  */
 std::string RefeusProcess::argParserNext(const std::vector<std::string> &arguments_separated_by_blank, std::vector<std::string>::iterator &start_iterator){
+  std::vector<std::string>::iterator it;
   std::string next_arg = "";
-  next_arg = (*start_iterator);
+  if ( start_iterator == arguments_separated_by_blank.end() ){
+    return next_arg;
+  }
+  bool in_quotes = false;
+  next_arg = "";
   for ( it = start_iterator
       ; it != arguments_separated_by_blank.end()
       ; it++
       ){
-    if ( (*it).at(0) == "\""
-      && !(*it).at((*it).size()-1) == "\""
+    if ( (*it).size() == 0 ) {
+      // empty string no next arg
+      break;
+    }
+
+    if ( (*it).at(0) == '\"'
+      && (*it).at((*it).size()-1) != '\"'
+      && (*it).size() > 1
       ){
-      next_arg = (*it).substr(1,(*it).size()-2);
+      if ( debug ) { std::cout << "begin quotes" << std::endl << std::flush; }
+      next_arg = (*it).substr(1,(*it).size()-1);
       in_quotes = true;
-    }
-    if ( (*it).at(0) == "\""
-      && (*it).at((*it).size()-1) == "\""
-      ){
-      next_arg = (*it).substr(1,(*it).size()-3);
-      break;
-    }
-    if ( in_quotes && (*it).at((*it).size()-1) == "\"" ){
-      next_arg+= (*it).substr(0,(*it).size()-2);
-      break;
-    }
-    if ( in_quotes ){
-      next_arg+= " " + next_arg;
       continue;
     }
+    if ( (*it).at(0) == '\"'
+      && (*it).at((*it).size()-1) == '\"'
+      && (*it).size() > 1
+      ){
+      if ( debug ) { std::cout << "full-quoted" << std::endl << std::flush; }
+      next_arg = (*it).substr(1,(*it).size()-2);
+      break;
+    }
+
+    if ( in_quotes && (*it).at((*it).size()-1) == '\"' ){
+      if ( debug ) { std::cout << "end quotes" << std::endl << std::flush; }
+      next_arg+= " " + (*it).substr(0,(*it).size()-1);
+      break;
+    }
+
+    if ( in_quotes ){
+      next_arg+= " " + *it;
+      continue;
+    }
+    next_arg+= *it;
     break;
   }
-  start_iterator = it;
+  start_iterator = ++it;
+  // if ( debug ) { std::cout << "next_arg: ret:[" << next_arg << "]" << std::endl << std::flush; }
   return next_arg;
 }
 
