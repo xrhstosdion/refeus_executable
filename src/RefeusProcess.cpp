@@ -105,16 +105,15 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
   *  --cloud-enabled sets CLOUD_ENABLED to true
   */
 bool RefeusProcess::argParser(std::string command_line) {
-  std::vector<std::string> per_blank_vector,per_quotes_vector;
-  //splitting command line per single blanks
-  split(command_line, " ", per_blank_vector);
+  std::vector<std::string> per_blank_vector;
   std::vector<std::string>::iterator it;
+  //splitting command line per single blanks
+  split(command_line, ' ', per_blank_vector);
   for ( it = per_blank_vector.begin()
       ; it < per_blank_vector.end()
       ; ++it
       ) {
-           std::string hello = *it;
-           printf("the per blank vector is %s \n",hello.c_str());
+    if ( debug ) std::cout << "param: [" << *it << "]" << std::endl << std::flush;
     if ( *it == "--help"
        ||*it == "/?"
        ) {
@@ -125,7 +124,7 @@ bool RefeusProcess::argParser(std::string command_line) {
       configureNewRefeusDocument();
     } else if ( *it == "--open" ) {
       ++it; // scroll to next (careful, processing in for-loop)
-      document_path = argParserNext(per_blank_vector, it);
+      std::string document_path = argParserNext(per_blank_vector, it);
       if ( document_path != "" ) {
         configureOpenRefeusDocument(document_path);
       } else {
@@ -156,18 +155,21 @@ bool RefeusProcess::argParser(std::string command_line) {
     } else if ( *it == "--no-auto-backup" ) {
       configureAutoBackup(false);
     } else if ( *it == "--skip-maintenance" ) {
-      configureSkipMaintenance(true)
+      configureSkipMaintenance(true);
     } else if ( *it == "--no-skip-maintenance" ) {
-      configureSkipMaintenance(false)
+      configureSkipMaintenance(false);
     } else if ( *it == "--startup-activity" ) {
       ++it; // scroll to next (careful, processing in for-loop)
       std::string startup_activity = argParserNext(per_blank_vector, it);
-      configureStartupActivity(startup_activity));
+      configureStartupActivity(startup_activity);
       if ( it == per_blank_vector.end() ){
         break;
       }
     } else if ( *it == "--infopool" ) {
       configureInfopool();
+    } else {
+      usage();
+      return false;
     }
     /**
      * REFEUS_SETTINGS_LOCATION=[when set: ini-file for portable]
@@ -207,6 +209,7 @@ void RefeusProcess::configureDebug() {
   #endif
   environmentmap["WKE_DEBUG"] = "YES";
   environmentmap["WKE_DEBUG_CONSOLE"] = "YES";
+  debug = true;
 }
 
 /**
@@ -229,7 +232,8 @@ void RefeusProcess::configureInfopool() {
    SetCurrentDirectory("infopool");
    #else
    executable = "node";
-   std::string ip_path = DATAROOTDIR + "infopool";
+   std::string ip_path = DATAROOTDIR;
+   ip_path+= "/infopool";
    chdir(ip_path.c_str());
    #endif
    parametersvector.push_back("app.js");
@@ -358,6 +362,7 @@ int RefeusProcess:: start() {
     std::copy(env.begin(), env.end(), env_cstr);
     env_cstr[env.size()] = '\0';
     putenv(env_cstr);
+    if ( debug ) { std::cout << "env: " << env << std::endl << std::flush; }
   }
 
   #ifdef _WIN32
@@ -404,10 +409,12 @@ int RefeusProcess:: start() {
    */
   char **exec_argv = static_cast<char**>(malloc(sizeof(char*) * (parametersvector.size() + 1) ));
   int parameter_iterator_index = 0;
+  if ( debug ) { std::cout << "executable: " << executable << std::endl << std::flush; }
   for ( parameter_iterator = parametersvector.begin()
       ; parameter_iterator < parametersvector.end()
       ; ++parameter_iterator
       ) {
+    if ( debug ) { std::cout << "parameter: " << *parameter_iterator << std::endl << std::flush; }
     exec_argv[parameter_iterator_index] = strdup((*parameter_iterator).c_str());
     parameter_iterator_index++;
   }

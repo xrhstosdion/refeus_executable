@@ -77,4 +77,4 @@ clean:
 #             that you defined earlier in this file.
 
 run:
-	./$(PROGRAM)
+	./$(PROGRAM) --debug
