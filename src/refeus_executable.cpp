@@ -16,10 +16,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
   if (r.argParser(command_line) ) {
     r.start();
   }
-  //return r.start();
-  //system("pause");
-  }
-  #endif
+}
+#endif
+
+
 #ifdef unix
 int main(int argc, char** argv) {
   RefeusProcess r;

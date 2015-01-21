@@ -84,7 +84,7 @@ std::string RefeusProcess::argParserNext(const std::vector<std::string> &argumen
       ; it != arguments_separated_by_blank.end()
       ; it++
       ){
-    if ( (*it).size() == 0 ) {
+    if ( (*it).size() == 0 ){
       // empty string no next arg
       break;
     }
@@ -142,17 +142,17 @@ bool RefeusProcess::argParser(std::string command_line) {
   for ( it = per_blank_vector.begin()
       ; it < per_blank_vector.end()
       ; ++it
-      ) {
+      ){
     //std_debug("param: [" << *it << "]");
     if ( *it == "--help"
        ||*it == "/?"
-       ) {
+       ){
       usage();
       return false;
     }
-    if ( *it == "--new" ) {
+    if ( *it == "--new" ){
       configureNewRefeusDocument();
-    } else if ( *it == "--open" ) {
+    } else if ( *it == "--open" ){
       ++it; // scroll to next (careful, processing in for-loop)
       std::string document_path = argParserNext(per_blank_vector, it);
       if ( document_path != "" ) {
@@ -182,39 +182,39 @@ bool RefeusProcess::argParser(std::string command_line) {
       if ( it == per_blank_vector.end() ){
         break;
       }
-    } else if ( *it == "--plus" ) {
+    } else if ( *it == "--plus" ){
       parametersvector.clear();
       parametersvector.push_back("plus.ini");
-    } else if ( *it == "--refeus" ) {
+    } else if ( *it == "--refeus" ){
       parametersvector.clear();
       parametersvector.push_back("refeus.ini");
-    } else if ( *it == "--cloud-enabled" ) {
+    } else if ( *it == "--cloud-enabled" ){
       configureCloudSetting();
-    } else if ( *it == "--debug" ) {
+    } else if ( *it == "--debug" ){
       configureDebug();
-    } else if ( *it == "--language" ) {
+    } else if ( *it == "--language" ){
       ++it; // scroll to next (careful, processing in for-loop)
       std::string iso_language = argParserNext(per_blank_vector, it);
       configureLanguageFromIsoString(iso_language);
       if ( it == per_blank_vector.end() ){
         break;
       }
-    } else if ( *it == "--auto-backup" ) {
+    } else if ( *it == "--auto-backup" ){
       configureAutoBackup(true);
-    } else if ( *it == "--no-auto-backup" ) {
+    } else if ( *it == "--no-auto-backup" ){
       configureAutoBackup(false);
-    } else if ( *it == "--skip-maintenance" ) {
+    } else if ( *it == "--skip-maintenance" ){
       configureSkipMaintenance(true);
-    } else if ( *it == "--no-skip-maintenance" ) {
+    } else if ( *it == "--no-skip-maintenance" ){
       configureSkipMaintenance(false);
-    } else if ( *it == "--startup-activity" ) {
+    } else if ( *it == "--startup-activity" ){
       ++it; // scroll to next (careful, processing in for-loop)
       std::string startup_activity = argParserNext(per_blank_vector, it);
       configureStartupActivity(startup_activity);
       if ( it == per_blank_vector.end() ){
         break;
       }
-    } else if ( *it == "--infopool" ) {
+    } else if ( *it == "--infopool" ){
       configureInfopool();
     } else {
       #ifndef _WIN32
@@ -299,7 +299,7 @@ void RefeusProcess::configureInfopool() {
   * \param api_language_code - windows-api language code
   */
 void RefeusProcess::configureLanguageFromAPICode(int api_language_code) {
-  switch ( api_language_code ) {
+  switch ( api_language_code ){
     case 1031:  //German
       environmentmap["DSC_Language"] = "German";
       environmentmap["Language"] = "German";
@@ -326,11 +326,11 @@ void RefeusProcess::configureLanguageFromAPICode(int api_language_code) {
 void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
   if ( iso_language == "en" ){
     configureLanguageFromAPICode(0); //default
-  } else if (iso_language == "de") {
+  } else if ( iso_language == "de" ){
     configureLanguageFromAPICode(1031);
-  } else if (iso_language == "fr") {
+  } else if ( iso_language == "fr" ){
     configureLanguageFromAPICode(1036);
-  } else if (iso_language == "pl") {
+  } else if ( iso_language == "pl" ){
     configureLanguageFromAPICode(1045);
   }
 }
@@ -388,7 +388,7 @@ void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) 
 std::vector<std::string> &RefeusProcess::split(const std::string &string_to_split, const char delimiter_character, std::vector<std::string> &element_vector) {
   std::stringstream sstream(string_to_split);
   std::string item;
-  while (std::getline(sstream, item, delimiter_character)) {
+  while ( std::getline(sstream, item, delimiter_character) ){
     element_vector.push_back(item);
   }
   return element_vector;
@@ -426,7 +426,10 @@ int RefeusProcess:: start() {
   STARTUPINFO StartupInfo;                        //This is an [in] parameter
   PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
   #endif
-  for ( map_iterator = environmentmap.begin(); map_iterator != environmentmap.end(); ++map_iterator) {
+  for ( map_iterator = environmentmap.begin()
+      ; map_iterator != environmentmap.end()
+      ; ++map_iterator
+      ){
     std::string env = map_iterator->first + "=" + map_iterator->second;
     char * env_cstr = new char[env.size() + 1];
     std::copy(env.begin(), env.end(), env_cstr);
@@ -442,7 +445,7 @@ int RefeusProcess:: start() {
   for ( parameter_iterator = parametersvector.begin()
       ; parameter_iterator < parametersvector.end()
       ; ++parameter_iterator
-      ) {
+      ){
     executable_with_parameter = executable_with_parameter + " " + *parameter_iterator;
   }
   ZeroMemory(&StartupInfo, sizeof(StartupInfo));
@@ -466,7 +469,7 @@ int RefeusProcess:: start() {
                                    , 0
                                    , &StartupInfo
                                    , &ProcessInfo);
-    if ( process_started ){
+  if ( process_started ){
     WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
     CloseHandle(ProcessInfo.hThread);
     CloseHandle(ProcessInfo.hProcess);
@@ -493,7 +496,6 @@ int RefeusProcess:: start() {
   for ( parameter_iterator = parametersvector.begin()
       ; parameter_iterator < parametersvector.end()
       ; ++parameter_iterator
-      ) {
       ){
     std_debug("parameter: " << *parameter_iterator);
     exec_argv[parameter_iterator_index] = strdup((*parameter_iterator).c_str());
