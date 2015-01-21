@@ -471,8 +471,16 @@ int RefeusProcess:: start() {
     CloseHandle(ProcessInfo.hThread);
     CloseHandle(ProcessInfo.hProcess);
   } else {
-     MessageBox(NULL, "The process could not be started... \n" , "Process Failed!", MB_OK);
-     return 1;
+    std::stringstream message_stream;
+    message_stream << "Sorry,"
+                   << std::endl << executable << " could not be started."
+                   << std::endl << "Please reinstall the software or contact your System Admisistrator."
+                   << std::endl << "The installation is expected to have a wrapper/launcher in the bin/ directory"
+                   << std::endl << "relative to this launcher, which cannot be found or executed."
+                   ;
+	std::string message = message_stream.str();
+    MessageBox(NULL,message.c_str(),"Check Installation!",MB_OK);
+    return 1;
   }
   #endif
   #ifdef unix
@@ -517,7 +525,7 @@ void RefeusProcess::usage() {
        "TODO: add more parameters"
        ;    
   #ifdef _WIN32
-  MessageBox(NULL, help_string, "Help!", MB_OK);
+  MessageBox(NULL, help_string, "Refeus Executable Usage", MB_OK);
   #endif
   #ifdef unix
   std::cout << help_string << std::endl;
