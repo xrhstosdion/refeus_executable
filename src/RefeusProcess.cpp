@@ -155,15 +155,15 @@ bool RefeusProcess::argParser(std::string command_line) {
     std_debug("quoted module: [" << command_line << "]");
   }
   /** eat leading whitespaces */
-  while ( command_line.at(0) == ' ' ){
+  while ( command_line.size() && command_line.at(0) == ' ' ){
     command_line = command_line.substr(1,command_line.size() - 1);
   }
   /** skip parsing when and interpet all as quoted filename
    * may also match ["filename" --language "de"], but we wont care!
    */
-  if ( command_line.at(0) == '\"'
+  if ( command_line.size() > 2
+    && command_line.at(0) == '\"'
     && command_line.at(command_line.size()-1) == '\"'
-	&& command_line.size() > 2
 	){
 	document_path = command_line.substr(1,command_line.size()-1);
 	configureOpenRefeusDocument(document_path);
