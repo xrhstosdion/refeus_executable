@@ -25,6 +25,6 @@ class RefeusProcess {
     public: bool argParser(std::string command_line);
     public: void langCheck(int check);
     public: void setEnvironment(std::string env_name, std::string env_value);
-    public: std::vector<std::string> &split(const std::string &string_to_split, char *delimiter_character, std::vector<std::string> &element_vector);
+    public: std::vector<std::string> &split(const std::string &string_to_split, const char delimiter_character, std::vector<std::string> &element_vector);
     public: int start();
 };

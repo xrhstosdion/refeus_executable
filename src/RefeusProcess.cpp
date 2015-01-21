@@ -301,10 +301,10 @@ void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) 
   * \param delimiter_character - character for splitting
   * \param element_vector - reference vector for storing the split result
   */
-std::vector<std::string> &RefeusProcess::split(const std::string &string_to_split, char* delimiter_character, std::vector<std::string> &element_vector) {
+std::vector<std::string> &RefeusProcess::split(const std::string &string_to_split, const char delimiter_character, std::vector<std::string> &element_vector) {
   std::stringstream sstream(string_to_split);
   std::string item;
-  while (std::getline(sstream, item, *delimiter_character)) {
+  while (std::getline(sstream, item, delimiter_character)) {
     element_vector.push_back(item);
   }
   return element_vector;
