@@ -15,15 +15,17 @@
 
 /** constructor
  */
-RefeusProcess::RefeusProcess() {
+RefeusProcess::RefeusProcess()
+: environmentmap()
+#ifdef _WIN32
+, executable("refeus.exe")
+#else
+, executable("refeus.sh")
+#endif
+, parametersvector()
+, debug(false) {
   parametersvector.push_back("startup.ini");
   configureAutoBackup(true);
-  #ifdef _WIN32
-  executable = "refeus.exe";
-  #endif
-  #ifdef unix
-  executable = "refeus.sh";
-  #endif
 }
 /**
  * get the next argument from a vector that is split by blanks
