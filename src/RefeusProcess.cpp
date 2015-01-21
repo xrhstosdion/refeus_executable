@@ -141,14 +141,20 @@ bool RefeusProcess::argParser(std::string command_line) {
           configureOpenRefeusDocument(document_path);
         } else {
           MessageBox(NULL, "Relative" , "Dbg Message for relative!", MB_OK);
+          //code for current working path
           char cCurrentPath[FILENAME_MAX];
           if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
             return errno;
           }
+          MessageBox(NULL, cCurrentPath, "current working path!", MB_OK);
           //code for appending cCurrentPath with document_path in order to be absolute filename
-          //configureOpenRefeusDocument(appended_string);
+          std::string cCurrentPath_cstr(cCurrentPath);
+          std::string correct = cCurrentPath_cstr + "\\" + document_path;
+          configureOpenRefeusDocument(correct);
+          const char* cc = correct.c_str();
+          MessageBox(NULL, cc, "Relative fixed to absolute", MB_OK); //whole string of document_path
         }
-        MessageBox(NULL, document_path.c_str() , "Help!", MB_OK); //whole string of document_path
+        MessageBox(NULL, document_path.c_str() , "User --open input!", MB_OK); //whole string of document_path
       } else {
         configureNewRefeusDocument();
       }
@@ -381,20 +387,20 @@ int RefeusProcess:: start() {
   char buffer[MAX_PATH];
   GetModuleFileName(NULL,buffer,sizeof(buffer));
   const char* path_string = buffer;
-  MessageBox(NULL, path_string, "Exepath!", MB_OK);
+  MessageBox(NULL, path_string, "Exe path!", MB_OK);  //absolute path of executable
   //current working path
-  char cCurrentPath[FILENAME_MAX];
-  if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-     {
-     return errno;
-     }
-  MessageBox(NULL, cCurrentPath, "curpath!", MB_OK);
-  std::string docdb_file = "\\default.docdb";
-  std::string cCurrentPath_cstr(cCurrentPath);
-  std::string correct = cCurrentPath_cstr + docdb_file;
-  const char* cc = correct.c_str();
-  MessageBox(NULL, cc, "docdb path!", MB_OK);
-  configureOpenRefeusDocument(correct);
+  //char cCurrentPath[FILENAME_MAX];
+  //if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+     //{
+     //return errno;
+     //}
+  //MessageBox(NULL, cCurrentPath, "curpath!", MB_OK);
+  //std::string docdb_file = "\\default.docdb";
+  //std::string cCurrentPath_cstr(cCurrentPath);
+  //std::string correct = cCurrentPath_cstr + docdb_file;
+  //const char* cc = correct.c_str();
+  //MessageBox(NULL, cc, "docdb path!", MB_OK);
+  //configureOpenRefeusDocument(correct);
   SetCurrentDirectory("bin");
   STARTUPINFO StartupInfo;                        //This is an [in] parameter
   PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
