@@ -169,8 +169,11 @@ bool RefeusProcess::argParser(std::string command_line) {
     } else if ( *it == "--infopool" ) {
       configureInfopool();
     } else {
+      #ifndef _WIN32
+      /* does not work in win32 because $0 is always part of the commandline and cannot be correctly predicted */
       usage();
       return false;
+      #endif
     }
     /**
      * REFEUS_SETTINGS_LOCATION=[when set: ini-file for portable]
