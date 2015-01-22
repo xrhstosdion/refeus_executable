@@ -8,6 +8,7 @@ class RefeusProcess {
     private: std::string executable;
     private: std::vector<std::string> parametersvector;
     private: bool debug;
+    private: void _debug(std::string message,std::string title = "");
 
     private: std::string argParserNext(const std::vector<std::string> &arguments_separated_by_blank, std::vector<std::string>::iterator &start_iterator);
     private: void configureAutoBackup(bool enabled);
