@@ -2,13 +2,13 @@
 #include <windows.h>
 #pragma comment(lib,"user32.lib")
 #endif
-#ifdef _WIN32
-    #include <direct.h>
-    #define GetCurrentDir _getcwd
-#else
-    #include <unistd.h>
-    #define GetCurrentDir getcwd
-#endif
+//#ifdef _WIN32
+    //#include <direct.h>
+    //#define GetCurrentDir _getcwd
+//#else
+    //#include <unistd.h>
+    //#define GetCurrentDir getcwd
+//#endif
 #ifdef unix
 #include <iostream>
 #include <stdlib.h> /* putenv */
