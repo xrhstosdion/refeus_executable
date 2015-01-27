@@ -20,8 +20,10 @@ class RefeusProcess {
     private: void configureOpenRefeusDocument(std::string pathname);
     private: void configureSkipMaintenance(bool enabled);
     private: void configureStartupActivity(std::string activity_name);
+    private: void configurePortable();
     private: void usage();
-
+    private: void configureRefeusSettingsLocation(std::string refeus_set_location);
+    
     public: RefeusProcess();
     public: bool argParser(std::string command_line);
     public: void configureLanguageFromAPICode(int check);
@@ -29,4 +31,5 @@ class RefeusProcess {
     public: void setEnvironment(std::string env_name, std::string env_value);
     public: std::vector<std::string> &split(const std::string &string_to_split, const char delimiter_character, std::vector<std::string> &element_vector);
     public: int start();
+    public: const char* toUpper(std::string& str);
 };
