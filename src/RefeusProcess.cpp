@@ -447,22 +447,6 @@ int RefeusProcess:: start() {
    * weird current directory
    */
   std::string bin_path = module_path.substr(0,module_path.rfind("\\")) + "\\bin";
-  if ( !SetCurrentDirectory(bin_path.c_str()) ){
-    std::stringstream message_stream;
-    message_stream << "Sorry,"
-                   << std::endl << executable << " could not be started."
-                   << std::endl << "Please reinstall the software or contact your System Admisistrator."
-                   << std::endl << "The installation is expected to have a wrapper/launcher in the bin/ directory"
-                   << std::endl << "relative to this launcher, which cannot be found or executed."
-                   ;
-	std::string message = message_stream.str();
-    MessageBox(NULL,message.c_str(),"Check Installation!",MB_OK);
-	return 1;
-  }
-
-  STARTUPINFO StartupInfo;                        //This is an [in] parameter
-  PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
-  #endif
   std::string bin_path_upper = bin_path;
   toUpper(bin_path_upper);
   std::string program_path = "C:\\PROGRAM";
@@ -480,6 +464,21 @@ int RefeusProcess:: start() {
   if ( bin_path_upper.find(user_path) != std::string::npos && environmentmap["PORTABLE"] == "true" ){
     configureRefeusSettingsLocation(bin_path);
   }
+  if ( !SetCurrentDirectory(bin_path.c_str()) ){
+    std::stringstream message_stream;
+    message_stream << "Sorry,"
+                   << std::endl << executable << " could not be started."
+                   << std::endl << "Please reinstall the software or contact your System Admisistrator."
+                   << std::endl << "The installation is expected to have a wrapper/launcher in the bin/ directory"
+                   << std::endl << "relative to this launcher, which cannot be found or executed."
+                   ;
+	std::string message = message_stream.str();
+    MessageBox(NULL,message.c_str(),"Check Installation!",MB_OK);
+	return 1;
+  }
+  STARTUPINFO StartupInfo;                        //This is an [in] parameter
+  PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
+  #endif
   for ( map_iterator = environmentmap.begin()
       ; map_iterator != environmentmap.end()
       ; ++map_iterator
