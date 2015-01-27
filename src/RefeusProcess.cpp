@@ -2,13 +2,6 @@
 #include <windows.h>
 #pragma comment(lib,"user32.lib")
 #endif
-#ifdef _WIN32
-    #include <direct.h>
-    #define GetCurrentDir _getcwd
-#else
-    #include <unistd.h>
-    #define GetCurrentDir getcwd
-#endif
 #ifdef unix
 #include <iostream>
 #include <stdlib.h> /* putenv */
@@ -21,6 +14,7 @@
 #include <string>
 #include <RefeusProcess.h>
 #include <config.h>
+#include <cctype> /* toupper */
 
 /**
  * debug helper macro which allows the power of stringstream
@@ -229,6 +223,8 @@ bool RefeusProcess::argParser(std::string command_line) {
       }
     } else if ( *it == "--infopool" ){
       configureInfopool();
+    } else if ( *it == "--portable" ){
+      configurePortable();
     } else {
       #ifndef _WIN32
       /* does not work in win32 because $0 is always part of the commandline and cannot be correctly predicted */
@@ -387,6 +383,21 @@ void RefeusProcess::configureSkipMaintenance(bool enabled){
  void RefeusProcess::configureStartupActivity(std::string activity_name){
    environmentmap["STARTUP_ACTIVITY"] = activity_name;
  }
+ 
+/**
+ * configure to set the portable option
+ * only useful when there is a portable device
+ */
+void RefeusProcess::configurePortable(){
+  environmentmap["PORTABLE"] = "true";
+}
+
+/**
+ * configure to set REFEUS_DOCUMENTS_LOCATION
+ */
+void RefeusProcess::configureRefeusSettingsLocation(std::string refeus_set_location) {
+   environmentmap["REFEUS_SETTINGS_LOCATION"] = refeus_set_location;
+}
 
 /**
  * stores the given key-value pair to apply it to the executable
@@ -395,7 +406,14 @@ void RefeusProcess::configureSkipMaintenance(bool enabled){
 void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) {
   environmentmap[env_name] = env_value;
 }
-
+/**
+ * Converts a string to upper case
+ */
+const char* RefeusProcess::toUpper(std::string& str){
+    for(int x=0; x<str.length(); x++)
+        str[x]=toupper(str[x]);
+        return str.c_str();
+}
 /** \brief Split String into Vector using a delimter
   * \param string_to_split - some string to be split by a specific character
   * \param delimiter_character - character for splitting
@@ -445,6 +463,23 @@ int RefeusProcess:: start() {
   STARTUPINFO StartupInfo;                        //This is an [in] parameter
   PROCESS_INFORMATION ProcessInfo; //This is what we get as an [out] parameter 
   #endif
+  std::string bin_path_upper = bin_path;
+  toUpper(bin_path_upper);
+  std::string program_path = "C:\\PROGRAM";
+  std::string user_path = "C:\\USER";
+  if ( bin_path_upper.find(program_path) != std::string::npos ){
+    configureRefeusSettingsLocation("registry");
+  }
+  if ( bin_path_upper.at(0) == 'D'
+    || bin_path_upper.at(0) == 'E'
+    || bin_path_upper.at(0) == 'F'
+    || bin_path_upper.at(0) == 'G'
+     ){
+    configureRefeusSettingsLocation(bin_path);
+  }
+  if ( bin_path_upper.find(user_path) != std::string::npos && environmentmap["PORTABLE"] == "true" ){
+    configureRefeusSettingsLocation(bin_path);
+  }
   for ( map_iterator = environmentmap.begin()
       ; map_iterator != environmentmap.end()
       ; ++map_iterator
@@ -456,7 +491,6 @@ int RefeusProcess:: start() {
     putenv(env_cstr);
     std_debug("env: " << env);
   }
-
   #ifdef _WIN32
   /**
    * win32 implementation only
