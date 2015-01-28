@@ -362,7 +362,6 @@ void RefeusProcess::configureOpenRefeusDocument(std::string path_name) {
   environmentmap["refeus_database_autostart"] = "true";
 }
 
-
 /**
  * configure to skip the database maintenance which can be anoying in
  * large document projects
@@ -406,14 +405,7 @@ void RefeusProcess::configureRefeusSettingsLocation(std::string refeus_set_locat
 void RefeusProcess::setEnvironment(std::string env_name, std::string env_value) {
   environmentmap[env_name] = env_value;
 }
-/**
- * Converts a string to upper case
- */
-const char* RefeusProcess::toUpper(std::string& str){
-    for(int x=0; x<str.length(); x++)
-        str[x]=toupper(str[x]);
-        return str.c_str();
-}
+
 /** \brief Split String into Vector using a delimter
   * \param string_to_split - some string to be split by a specific character
   * \param delimiter_character - character for splitting
@@ -447,21 +439,16 @@ int RefeusProcess:: start() {
    * weird current directory
    */
   std::string bin_path = module_path.substr(0,module_path.rfind("\\")) + "\\bin";
-  std::string bin_path_upper = bin_path;
-  toUpper(bin_path_upper);
-  std::string program_path = "C:\\PROGRAM";
-  std::string user_path = "C:\\USER";
-  if ( bin_path_upper.find(program_path) != std::string::npos ){
-    configureRefeusSettingsLocation("registry");
-  }
-  if ( bin_path_upper.at(0) == 'D'
-    || bin_path_upper.at(0) == 'E'
-    || bin_path_upper.at(0) == 'F'
-    || bin_path_upper.at(0) == 'G'
-     ){
+  /** DRIVE_REMOVABLE = 2 DRIVE_FIXED(can also be flash drive) = 3
+   * DRIVE_REMOTE(network) = 4
+   */
+  if ( (GetDriveType( NULL ) == 3 || GetDriveType( NULL ) == 4) && environmentmap["PORTABLE"] == "true" ){
     configureRefeusSettingsLocation(bin_path);
   }
-  if ( bin_path_upper.find(user_path) != std::string::npos && environmentmap["PORTABLE"] == "true" ){
+  else if ( GetDriveType( NULL ) == 3 ){
+   configureRefeusSettingsLocation("registry");
+  }
+  if ( GetDriveType( NULL ) == 2 ){
     configureRefeusSettingsLocation(bin_path);
   }
   if ( !SetCurrentDirectory(bin_path.c_str()) ){
@@ -576,6 +563,7 @@ void RefeusProcess::usage() {
        "--[no]-skip-maintenance enable or disable the initial maintenance check when refeus opens\n" 
        "--language [de|en|fr*|pl*] set default language when application starts\n" 
        "--infopool start local infopool (plus only)\n"
+       "--portable for taking data and settings from the application (.conf file)"
        "TODO: add more parameters"
        ;    
   #ifdef _WIN32
