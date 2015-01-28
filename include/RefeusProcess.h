@@ -31,5 +31,4 @@ class RefeusProcess {
     public: void setEnvironment(std::string env_name, std::string env_value);
     public: std::vector<std::string> &split(const std::string &string_to_split, const char delimiter_character, std::vector<std::string> &element_vector);
     public: int start();
-    public: const char* toUpper(std::string& str);
 };
