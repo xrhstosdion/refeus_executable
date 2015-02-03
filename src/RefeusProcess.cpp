@@ -41,6 +41,8 @@ void RefeusProcess::_debug(std::string message,std::string title){
  */
 RefeusProcess::RefeusProcess()
 : environmentmap()
+, portable(false)
+, selected_iso_language("")
 #ifdef _WIN32
 , executable("refeus.exe")
 #else
@@ -333,17 +335,22 @@ void RefeusProcess::configureLanguageFromAPICode(int api_language_code) {
  * the implementation could use a better method to map from iso to win32 codes
  */
 void RefeusProcess::configureLanguageFromIsoString(std::string iso_language) {
-  if ( iso_language == "en" ){
+  selected_iso_language = iso_language;
+}
+
+void RefeusProcess::configureLanguage() {
+  if ( selected_iso_language == "" ) {
+    configureLanguageFromAPICode(GetUserDefaultLCID());
+  } else if ( selected_iso_language == "en" ){
     configureLanguageFromAPICode(0); //default
-  } else if ( iso_language == "de" ){
+  } else if ( selected_iso_language == "de" ){
     configureLanguageFromAPICode(1031);
-  } else if ( iso_language == "fr" ){
+  } else if ( selected_iso_language == "fr" ){
     configureLanguageFromAPICode(1036);
-  } else if ( iso_language == "pl" ){
+  } else if ( selected_iso_language == "pl" ){
     configureLanguageFromAPICode(1045);
   }
 }
-
 /**
  * show file-open dialog, not the default startup
  */
@@ -389,6 +396,34 @@ void RefeusProcess::configureSkipMaintenance(bool enabled){
  */
 void RefeusProcess::configurePortable(){
   environmentmap["PORTABLE"] = "true";
+  portable = true;
+}
+
+/** 
+ * Returns the full path of the directory that refeus.exe was called
+ * but with //bin path added
+ */
+std::string RefeusProcess::configureBinPath(){
+  char module_path_c[MAX_PATH];
+  GetModuleFileName(NULL,module_path_c,sizeof(module_path_c));
+  std::string module_path = module_path_c;
+  std::string bin_path = module_path.substr(0,module_path.rfind("\\")) + "\\bin";
+  return bin_path;
+}
+
+/** 
+ * Configures REFEUS_DOCUMENTS_LOCATION depending on type of current drive
+ * DRIVE_REMOVABLE = 2 DRIVE_FIXED(can also be flash drive) = 3
+ * DRIVE_REMOTE(network) = 4
+ */
+void RefeusProcess::configureDriveType(){
+   bool removable_device = ( GetDriveType( NULL ) == 2 );
+  if ( portable ){
+    configureRefeusSettingsLocation(configureBinPath());
+  }
+  else if ( removable_device ){
+    configureRefeusSettingsLocation(configureBinPath());
+  }
 }
 
 /**
@@ -430,28 +465,11 @@ int RefeusProcess:: start() {
   std::vector<std::string>::iterator parameter_iterator;
   std::map<std::string, std::string>::iterator map_iterator;
   #ifdef _WIN32
-  //path of the executable
-  char module_path_c[MAX_PATH];
-  GetModuleFileName(NULL,module_path_c,sizeof(module_path_c));
-  std::string module_path = module_path_c; // including xxx.exe
-  /** set the current working directory to the location of the module + bin 
-   * this is required because registry association of *.docdb executes with
-   * weird current directory
-   */
-  std::string bin_path = module_path.substr(0,module_path.rfind("\\")) + "\\bin";
-  /** DRIVE_REMOVABLE = 2 DRIVE_FIXED(can also be flash drive) = 3
-   * DRIVE_REMOTE(network) = 4
-   */
-  if ( (GetDriveType( NULL ) == 3 || GetDriveType( NULL ) == 4) && environmentmap["PORTABLE"] == "true" ){
-    configureRefeusSettingsLocation(bin_path);
-  }
-  else if ( GetDriveType( NULL ) == 3 ){
-   configureRefeusSettingsLocation("registry");
-  }
-  if ( GetDriveType( NULL ) == 2 ){
-    configureRefeusSettingsLocation(bin_path);
-  }
-  if ( !SetCurrentDirectory(bin_path.c_str()) ){
+/** set the current working directory to the location of the module + bin 
+  * this is required because registry association of *.docdb executes with
+  * weird current directory
+  */
+  if ( !SetCurrentDirectory(configureBinPath().c_str()) ){
     std::stringstream message_stream;
     message_stream << "Sorry,"
                    << std::endl << executable << " could not be started."
