@@ -10,15 +10,17 @@
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow ) {
 
   RefeusProcess r;
+  
   char *command_line_cstr = GetCommandLine();
   std::string command_line = command_line_cstr;
-  r.configureLanguageFromAPICode(GetUserDefaultLCID());
+   
   if (r.argParser(command_line) ) {
-    r.start();
+   r.configureDriveType();
+   r.configureLanguage();
+   r.start();
   }
 }
 #endif
-
 
 #ifdef unix
 int main(int argc, char** argv) {
