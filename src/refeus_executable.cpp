@@ -1,23 +1,24 @@
 #ifdef _WIN32
 #include <windows.h>
+#include <iostream>
 #endif
 #ifdef unix
 #include <iostream>
 #endif
-#include <RefeusProcess.h>
+#include <ConfigureFunctions.h>
+#include <ArgParserConfiguration.h>
+#include <ApplicationProcess.h>
 
 #ifdef _WIN32
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow ) {
 
-  RefeusProcess r;
-  
   char *command_line_cstr = GetCommandLine();
   std::string command_line = command_line_cstr;
-   
+  ApplicationProcess r;
   if (r.argParser(command_line) ) {
-   r.configureDriveType();
-   r.configureLanguage();
-   r.start();
+    r.configureDriveType();
+    r.configureLanguage();
+    r.start();
   }
 }
 #endif
