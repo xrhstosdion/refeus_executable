@@ -1,21 +1,24 @@
-all: refeus_executable.exe refeus_executable.msi
+all: refeus_executable.exe
 
-refeus_executable.exe: .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res
-	link .lib/refeus_executable.obj .lib/RefeusProcess.obj .lib/refeus.res .lib/icon.res /out:"refeus_executable.exe"
+refeus_executable.exe: .lib/refeus_executable.obj .lib/ApplicationProcess.obj .lib/ConfigureFunctions.obj .lib/ArgParserConfiguration.obj .lib/refeus.res .lib/icon.res
+	link .lib/refeus_executable.obj .lib/ApplicationProcess.obj .lib/ArgParserConfiguration.obj .lib/ConfigureFunctions.obj .lib/refeus.res .lib/icon.res /out:"refeus_executable.exe"
 
-refeus_executable.msi: refeus_executable.exe msi/refeus_installer.wxs
- if NOT EXIST ".lib" md .lib
- candle msi/refeus_installer.wxs -o ".lib/refeus_installer.wixobj"
- light .lib/refeus_installer.wixobj -o "refeus_executable.msi" -pdbout ".lib/refeus_executable.wixpdb"
-
-.lib/refeus_executable.obj: src/refeus_executable.cpp .lib/RefeusProcess.obj
+.lib/refeus_executable.obj: src/refeus_executable.cpp .lib/ArgParserConfiguration.obj
 	if NOT EXIST ".lib" md .lib
  cl /EHsc /I include/ /c src/refeus_executable.cpp /Fo".lib/refeus_executable.obj" 
 
-.lib/RefeusProcess.obj: src/RefeusProcess.cpp include/RefeusProcess.h
+.lib/ConfigureFunctions.obj: src/ConfigureFunctions.cpp include/ConfigureFunctions.h
 	if NOT EXIST ".lib" md .lib
- cl /I include/ /EHsc /c src/RefeusProcess.cpp /Fo".lib/RefeusProcess.obj"
-
+ cl /I include/ /EHsc /c src/ConfigureFunctions.cpp /Fo".lib/ConfigureFunctions.obj"
+ 
+.lib/ApplicationProcess.obj: src/ApplicationProcess.cpp include/ApplicationProcess.h
+	if NOT EXIST ".lib" md .lib
+ cl /I include/ /EHsc /c src/ApplicationProcess.cpp /Fo".lib/ApplicationProcess.obj"
+ 
+.lib/ArgParserConfiguration.obj: src/ArgParserConfiguration.cpp include/ArgParserConfiguration.h
+	if NOT EXIST ".lib" md .lib
+ cl /I include/ /EHsc /c src/ArgParserConfiguration.cpp /Fo".lib/ArgParserConfiguration.obj"
+ 
 .lib/refeus.res: rc/refeus.rc
  rc /r /fo".lib\refeus.res" rc/refeus.rc
 
@@ -27,7 +30,4 @@ clean:
  del .lib\*.obj
  del *.exe
  del .lib\*.res
- del .lib\*.wixobj
- del .lib\*.wixpdb
- del *.msi
  rmdir .lib
